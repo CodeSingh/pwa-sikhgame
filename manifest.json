@@ -1,0 +1,20 @@
+{
+    "name": "Sikh Game",
+    "short_name": "Sikh Game",
+    "lang": "en-US",
+    "start_url": "/pwa-sikhgame/index.html",
+    "display": "standalone",
+    "theme_color": "#FFA500",
+    "icons": [
+      {
+        "src": "PriceList.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "PriceList.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }

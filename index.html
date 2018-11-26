@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="manifest" href="/pwa-sikhgame/manifest.json">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Price List">
+    <meta name="apple-mobile-web-app-title" content="Price List">
+    <meta name="theme-color" content="#FFA500">
+    <meta name="msapplication-navbutton-color" content="#FFA500">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="msapplication-starturl" content="/index.html">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <link rel="icon" type="image/png" sizes="192x192" href="PriceList.png">
+    <link rel="apple-touch-icon" type="image/png" sizes="192x192" href="PriceList.png">
+
+    <title>Sikh Games</title>
+    <link rel="stylesheet" type="text/css" href="bulma.min.css" media="all">
+    <link rel="stylesheet" type="text/css" href="index.css" media="all">
+    <script src="vue.js"></script>
+</head>
+<body>
+    <div id='app'>
+        <nav class="navbar is-warning" role="navigation" aria-label="main navigation">
+            <div class="navbar-start">
+                <div class="navbar-item">
+                    <div class="field is-grouped">
+                        <p class='control'>
+                            <img src='SikhGame.png' alt="Sikh Games: Get totals for samosa and spring roll sales">
+                        </p>
+                        <p class='control'>
+                            <span class='is-size-5'>Sikh Games</span>
+                        </p>
+                        <p class="control">
+                            <span class='is-size-5'></span>
+                        </p>
+                        <p class="control">
+                            <img @click='share' src='share.png' height='10px' />
+                        </p>
+                    </div>
+                </div>
+                
+            </div>
+        </nav>
+        <div class="section">
+           
+
+        </div>
+    </div>
+</body>
+<script>
+    Vue.filter('currency', function (value) {
+        return '£' + parseFloat(value).toFixed(2);
+    });
+
+    var app = new Vue({
+    el: '#app',
+    data: {
+        hangmanAnswers: [
+            {answer: 'ਸਿੱਖ', clues:['5th largest religion in the world'], tags:''},
+            {answer: 'ਬੰਦਾ ਸਿੰਘ ਬਹਾਦਰ', clues:['Known as Lakshmi Das'], tags:''}
+        ]  
+    },
+    methods: {
+        share: function(){
+
+            if ('share' in navigator) {
+                navigator.share({
+                    title: 'Sikh Game Total: ',
+                    text: '',
+                    url: location.href
+                })
+            }
+            else{
+                alert('Share not available for order: ' + this.shareText);
+            }
+        }
+    },
+    computed:{
+
+    }
+});
+</script>
+
+<script>
+    if('serviceWorker' in navigator) {
+        navigator.serviceWorker
+                .register('/pwa-sikhgame/sw.js')
+                .then(function() { console.log("Service Worker Registered"); });
+    }
+</script>
+        
+</html>
+
