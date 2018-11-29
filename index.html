@@ -45,9 +45,20 @@
                 
             </div>
         </nav>
-        <div class="section">
-           
-
+        <div v-if='gameInProgress' class='section'>
+            <div class='content is-large'>
+                <h1>{{currentProcessedAnswer}}</h1>
+            </div>
+            <div>
+                <h2>Selected Letters</h2>
+                <a class='button is-black' v-for='lt in selectedLetters'>{{lt}}</a>
+            </div>
+            <a class='button is-white' @click='addSelectedLetter(akhar)' v-for='(akhar, index) in gurmukhiLetters'>
+                {{akhar}}
+            </a>
+        </div>
+        <div v-else class='section'>
+            <a @click='startGame' class='button is-success is-outlined'>Start Hangman</a>
         </div>
     </div>
 </body>
@@ -60,11 +71,35 @@
     el: '#app',
     data: {
         hangmanAnswers: [
-            {answer: 'ਸਿੱਖ', clues:['5th largest religion in the world'], tags:''},
+            {answer: 'ਸਿੱਖੀ', clues:['5th largest religion in the world'], tags:''},
             {answer: 'ਬੰਦਾ ਸਿੰਘ ਬਹਾਦਰ', clues:['Known as Lakshmi Das'], tags:''}
-        ]  
+        ],
+        currentAnswer : null,
+        currentClues: null,
+        currentTags: null,
+        selectedLetters: null,
+        gameInProgress: false,
+        gurmukhiLetters: ['ੳ', 'ਅ', 'ੲ', 'ਸ', 'ਹ',
+                        'ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਙ',
+                        'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਞ',
+                        'ਟ', 'ਠ', 'ਡ', 'ਢ', 'ਣ', 
+                        'ਤ', 'ਥ', 'ਦ', 'ਧ', 'ਨ', 
+                        'ਪ', 'ਫ', 'ਬ', 'ਭ', 'ਮ', 
+                        'ਯ', 'ਰ', 'ਲ', 'ਵ', 'ੜ', 
+                        'ਸ਼', 'ਖ਼', 'ਗ਼', 'ਜ਼', 'ਫ਼', 
+                        'ਲ਼', '਼', 'ਾ', 'ਿ', 'ੀ', 
+                        'ੁ', 'ੂ', 'ੇ', 'ੈ', 'ੋ', 
+                        'ੌ', '੍', 'ੰ', 'ੱ' 
+                    ]
     },
     methods: {
+        startGame: function(){
+            this.gameInProgress = true;
+            this.currentAnswer = this.hangmanAnswers[0].answer;
+            this.currentClues = this.hangmanAnswers[0].clues;
+            this.currentTags = this.hangmanAnswers[0].tags;
+            this.selectedLetters = [];
+        },
         share: function(){
 
             if ('share' in navigator) {
@@ -75,13 +110,28 @@
                 })
             }
             else{
-                alert('Share not available for order: ' + this.shareText);
+                alert('Share not available');
             }
+        },
+        addSelectedLetter: function(_letter){
+            this.selectedLetters.push(_letter);
         }
     },
     computed:{
-
-    }
+        currentProcessedAnswer: function(){
+            var processed = [];
+            for(i=0; i<this.currentAnswer.length; i++) {
+                if(this.selectedLetters.indexOf(this.currentAnswer[i]) > -1 ){
+                    processed.push(this.currentAnswer[i]);
+                }
+                else{
+                    processed.push('_');
+                }
+            }         
+            return processed.join('');
+        }
+    },
+    watcher:{}
 });
 </script>
 
