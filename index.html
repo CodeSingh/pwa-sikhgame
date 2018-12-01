@@ -29,7 +29,7 @@
                 <div class="navbar-item">
                     <div class="field is-grouped">
                         <p class='control'>
-                            <img src='SikhGame.png' alt="Sikh Games: Get totals for samosa and spring roll sales">
+                            <img src='SikhGame.png' alt="Sikh Games">
                         </p>
                         <p class='control'>
                             <span class='is-size-5'>Sikh Games</span>
@@ -45,7 +45,7 @@
                 
             </div>
         </nav>
-        <div v-if='gameInProgress' class='section'>
+        <div v-if='gameStatus == 1' class='section'>
             <div class='content is-large'>
                 <h1>{{currentProcessedAnswer}}</h1>
             </div>
@@ -57,8 +57,25 @@
                 {{akhar}}
             </a>
         </div>
-        <div v-else class='section'>
+        <div v-if='gameStatus == 0' class='section'>
             <a @click='startGame' class='button is-success is-outlined'>Start Hangman</a>
+        </div>
+        <div v-if='gameStatus == 2' class='section'>
+            <span>Great you got it right!! The answer was {{currentAnswer}}</span>
+            <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+        </div>
+        <div v-if='gameStatus == 3' class='section'>
+            <span>Oh no you got it wrong!! The answer was {{currentAnswer}}</span>
+            <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+        </div>
+        <div v-if='gameStatus == 4' class='section'>
+            <span>All finished. welldone!! The answer was {{currentAnswer}}</span>
+            <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+        </div>
+        <div class="container is-mobile" v-for='item in history'>
+            <div class="notification">
+                {{item.answer}} - {{item.status}}
+            </div>
         </div>
     </div>
 </body>
@@ -70,15 +87,19 @@
     var app = new Vue({
     el: '#app',
     data: {
+        history: [],
+        attemptLimit: 10,
+        attemptNo: 0,
+        currentAnswerNo: 0,
         hangmanAnswers: [
             {answer: 'ਸਿੱਖੀ', clues:['5th largest religion in the world'], tags:''},
-            {answer: 'ਬੰਦਾ ਸਿੰਘ ਬਹਾਦਰ', clues:['Known as Lakshmi Das'], tags:''}
+            {answer: 'ਬੰਦਾ ਸਿੰਘ ਬਹਾਦਰ', clues:['Known as Lakshman Das'], tags:''}
         ],
         currentAnswer : null,
         currentClues: null,
         currentTags: null,
         selectedLetters: null,
-        gameInProgress: false,
+        gameStatus: 0,
         gurmukhiLetters: ['ੳ', 'ਅ', 'ੲ', 'ਸ', 'ਹ',
                         'ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਙ',
                         'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਞ',
@@ -94,14 +115,14 @@
     },
     methods: {
         startGame: function(){
-            this.gameInProgress = true;
-            this.currentAnswer = this.hangmanAnswers[0].answer;
-            this.currentClues = this.hangmanAnswers[0].clues;
-            this.currentTags = this.hangmanAnswers[0].tags;
+            this.gameStatus = 1;
+            this.currentAnswer = this.hangmanAnswers[this.currentAnswerNo].answer;
+            this.currentClues = this.hangmanAnswers[this.currentAnswerNo].clues;
+            this.currentTags = this.hangmanAnswers[this.currentAnswerNo].tags;
             this.selectedLetters = [];
+            this.attemptNo = 0;
         },
         share: function(){
-
             if ('share' in navigator) {
                 navigator.share({
                     title: 'Sikh Game Total: ',
@@ -115,6 +136,9 @@
         },
         addSelectedLetter: function(_letter){
             this.selectedLetters.push(_letter);
+            if(this.currentAnswer.indexOf(_letter) == -1){
+                this.attemptNo++;
+            }
         }
     },
     computed:{
@@ -125,13 +149,39 @@
                     processed.push(this.currentAnswer[i]);
                 }
                 else{
-                    processed.push('_');
+                    this.currentAnswer[i] == ' ' ? processed.push(' ') : processed.push('_');
                 }
             }         
             return processed.join('');
         }
     },
-    watcher:{}
+    watch:{
+        selectedLetters : function(val){
+            // won
+            if(this.currentAnswer == this.currentProcessedAnswer){
+                this.history.push({answer: this.currentAnswer, status: 'correct'});
+                this.currentAnswerNo++;
+                if(this.currentAnswerNo < this.hangmanAnswers.length){
+                    this.gameStatus= 2;
+                }
+                else{
+                    this.gameStatus= 4;
+                }
+            }
+            else{ // in progress
+                if(this.attemptNo == this.attemptLimit){
+                    this.history.push({answer: this.currentAnswer, status: 'wrong'});
+                    this.currentAnswerNo++;                    
+                    if(this.currentAnswerNo < this.hangmanAnswers.length){
+                        this.gameStatus= 3;  
+                    }
+                    else{
+                        this.gameStatus= 4;
+                    }
+                }
+            }
+        }
+    }
 });
 </script>
 
