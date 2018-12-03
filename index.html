@@ -80,6 +80,8 @@
                         <div class='container' >
                             <div class='notification'>
                                 Total Points: {{totalPoints}}
+                                <a v-if='!showClue' @click='showClue = true' class='button is-info'>Show Clue</a>
+                                <span v-else>{{currentClues[0]}}</span>
                             </div>
                         </div>
 
@@ -104,6 +106,7 @@
     el: '#app',
     data: {
         history: [],
+        showClue:false,
         attemptLimit: 10,
         attemptNo: 0,
         currentAnswerNo: 0,
