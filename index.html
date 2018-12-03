@@ -46,7 +46,7 @@
             </div>
         </nav>
         <div class="tile is-ancestor">
-                <div class="tile is-4 has-background-warning">
+                <div class="tile is-4 has-background-danger">
                     <div v-if='gameStatus == 1' class='section'>
                         <div class='content is-large'>
                             <h1>{{currentProcessedAnswer}}</h1>
@@ -60,41 +60,40 @@
                         </a>
                     </div>
                     <div v-if='gameStatus == 0' class='section'>
-                        <a @click='startGame' class='button is-success is-outlined'>Start Hangman</a>
+                        <a @click='startGame' class='button is-success'>Start Hangman</a>
                     </div>
                     <div v-if='gameStatus == 2' class='section'>
                         <span>Great you got it right!! The answer was {{currentAnswer}}</span><br />
                         <span>You received {{attemptLimit - attemptNo}} point(s)</span>
-                        <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+                        <a @click='startGame' class='button is-info'>Next Hangman</a>
                     </div>
                     <div v-if='gameStatus == 3' class='section'>
                         <span>Oh no you got it wrong!! </span>
-                        <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+                        <a @click='startGame' class='button is-info'>Next Hangman</a>
                     </div>
                     <div v-if='gameStatus == 4' class='section'>
-                        <span>All finished. well done!! Your total points were {}</span>
-                        <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+                        <span>All finished. well done!! Your total points were {{totalPoints}}</span>
+                        <a @click='resetGame' class='button is-info'>Next Hangman</a>
                     </div>
                 </div>
                 <div class="tile has-background-info">
-                        <div class='container' >
+                        <div class='tile is-child' >
                             <div class='notification'>
-                                Total Points: {{totalPoints}}
-                                <a v-if='!showClue' @click='showClue = true' class='button is-info'>Show Clue</a>
-                                <span v-else>{{currentClues[0]}}</span>
+                                Total Points: {{totalPoints}} 
+                                <a v-if='!showClue && currentClues != null' @click='showClue = true' class='button is-info'>Show Clue</a>
+                                <span v-if='showClue && currentClues != null'>{{currentClues[0]}}</span>
+                            </div>
+
+                            <div class="container" v-for='item in history'>
+                                <div class="notification">
+                                    {{item.answer}} - {{item.status}}
+                                </div>
                             </div>
                         </div>
 
-                        <div class="container" v-for='item in history'>
-                            <div class="notification">
-                                {{item.status == 3 ? '---' : item.answer}} - {{item.status}}
-                            </div>
-                        </div>
+
                 </div>
         </div>
-
-
-
     </div>
 </body>
 <script>
@@ -111,12 +110,16 @@
         attemptNo: 0,
         currentAnswerNo: 0,
         hangmanAnswers: [
+            
+            {answer: 'ਮਾਤਾ ਭਾਗ ਕੌਰ ਜੀ', clues:['Led the forty liberated ones in the Battle of Muktsar'], tags:'person'},
+            {answer: 'ਹਰੀ ਸਿੰਘ ਨਲਵਾ ਜੀ', clues:['Commander-in-chief of the Sikh Khalsa Army'], tags:'person'},
             {answer: 'ਸਿੱਖੀ', clues:['5th largest religion in the world'], tags:''},
-            {answer: 'ਬੰਦਾ ਸਿੰਘ ਬਹਾਦਰ ਜੀ', clues:['Known as Lakshman Das'], tags:'person'},
+            {answer: 'ਬੰਦਾ ਸਿੰਘ ਬਹਾਦਰ ਜੀ', clues:['Previously known as Maadho  Das'], tags:'person'},
             {answer: 'ਬੀਬੀ ਨਾਨਕੀ ਜੀ', clues:['The first Sikh'], tags:'person'},
             {answer: 'ਭਾੲੀ ਵੀਰ ਸਿੰਘ ਜੀ', clues:['Famous Sikh author'], tags:'person'},
             {answer: 'ਬਾਬਾ ਫਤਿਹ ਸਿੰਘ ਜੀ', clues:['Youngest Sikh martyr', '4th Sahibzada of Guru Gobind Singh Ji'], tags:'person'},
             {answer: 'ਮਾਹਾਰਾਜਾ ਰਣਜੀਤ ਸਿੰਘ ਜੀ', clues:['Ruler of the Sikh empire'], tags:'person'},
+            {answer: 'ਹਰੀ ਸਿੰਘ ਨਲਵਾ ਜੀ', clues:['Commander-in-chief of the Sikh Khalsa Army'], tags:'person'}
         ],
         currentAnswer : null,
         currentClues: null,
@@ -138,7 +141,8 @@
     },
     methods: {
         startGame: function(){
-            this.gameStatus = 1;
+            this.gameStatus = this.history.length < this.hangmanAnswers.length ? 1 : 4;
+            this.showClue = false;
             this.currentAnswer = this.hangmanAnswers[this.currentAnswerNo].answer;
             this.currentClues = this.hangmanAnswers[this.currentAnswerNo].clues;
             this.currentTags = this.hangmanAnswers[this.currentAnswerNo].tags;
