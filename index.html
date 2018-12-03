@@ -45,38 +45,54 @@
                 
             </div>
         </nav>
-        <div v-if='gameStatus == 1' class='section'>
-            <div class='content is-large'>
-                <h1>{{currentProcessedAnswer}}</h1>
-            </div>
-            <div>
-                <h2>Selected Letters</h2>
-                <a class='button is-black' v-for='lt in selectedLetters'>{{lt}}</a>
-            </div>
-            <a class='button is-white' @click='addSelectedLetter(akhar)' v-for='(akhar, index) in gurmukhiLetters'>
-                {{akhar}}
-            </a>
+        <div class="tile is-ancestor">
+                <div class="tile is-4 has-background-warning">
+                    <div v-if='gameStatus == 1' class='section'>
+                        <div class='content is-large'>
+                            <h1>{{currentProcessedAnswer}}</h1>
+                        </div>
+                        <div>
+                            <h2>Selected Letters ({{attemptLimit - attemptNo}} out of {{attemptLimit}})</h2>
+                            <a class='button is-black' v-for='lt in selectedLetters'>{{lt}}</a>
+                        </div>
+                        <a class='button is-white' @click='addSelectedLetter(akhar)' v-for='(akhar, index) in gurmukhiLetters'>
+                            {{akhar}}
+                        </a>
+                    </div>
+                    <div v-if='gameStatus == 0' class='section'>
+                        <a @click='startGame' class='button is-success is-outlined'>Start Hangman</a>
+                    </div>
+                    <div v-if='gameStatus == 2' class='section'>
+                        <span>Great you got it right!! The answer was {{currentAnswer}}</span><br />
+                        <span>You received {{attemptLimit - attemptNo}} point(s)</span>
+                        <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+                    </div>
+                    <div v-if='gameStatus == 3' class='section'>
+                        <span>Oh no you got it wrong!! </span>
+                        <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+                    </div>
+                    <div v-if='gameStatus == 4' class='section'>
+                        <span>All finished. well done!! Your total points were {}</span>
+                        <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
+                    </div>
+                </div>
+                <div class="tile has-background-info">
+                        <div class='container' >
+                            <div class='notification'>
+                                Total Points: {{totalPoints}}
+                            </div>
+                        </div>
+
+                        <div class="container" v-for='item in history'>
+                            <div class="notification">
+                                {{item.status == 3 ? '---' : item.answer}} - {{item.status}}
+                            </div>
+                        </div>
+                </div>
         </div>
-        <div v-if='gameStatus == 0' class='section'>
-            <a @click='startGame' class='button is-success is-outlined'>Start Hangman</a>
-        </div>
-        <div v-if='gameStatus == 2' class='section'>
-            <span>Great you got it right!! The answer was {{currentAnswer}}</span>
-            <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
-        </div>
-        <div v-if='gameStatus == 3' class='section'>
-            <span>Oh no you got it wrong!! The answer was {{currentAnswer}}</span>
-            <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
-        </div>
-        <div v-if='gameStatus == 4' class='section'>
-            <span>All finished. welldone!! The answer was {{currentAnswer}}</span>
-            <a @click='startGame' class='button is-warning is-outlined'>Next Hangman</a>
-        </div>
-        <div class="container is-mobile" v-for='item in history'>
-            <div class="notification">
-                {{item.answer}} - {{item.status}}
-            </div>
-        </div>
+
+
+
     </div>
 </body>
 <script>
@@ -93,11 +109,11 @@
         currentAnswerNo: 0,
         hangmanAnswers: [
             {answer: 'ਸਿੱਖੀ', clues:['5th largest religion in the world'], tags:''},
-            {answer: 'ਬੰਦਾ ਸਿੰਘ ਬਹਾਦਰ ਜੀ', clues:['Known as Lakshman Das'], tags:''},
-            {answer: 'ਬੀਬੀ ਨਾਨਕੀ ਜੀ', clues:['The first Sikh'], tags:''},
-            {answer: 'ਭਾੲੀ ਵੀਰ ਸਿੰਘ ਜੀ', clues:['Fomous Sikh author'], tags:''},
-            {answer: 'ਬਾਬਾ ਫਤਿਹ ਸਿੰਘ ਜੀ', clues:['Youngest Sikh martyr', '4th Sahibzade of Guru Gobind Singh Ji'], tags:''},
-            
+            {answer: 'ਬੰਦਾ ਸਿੰਘ ਬਹਾਦਰ ਜੀ', clues:['Known as Lakshman Das'], tags:'person'},
+            {answer: 'ਬੀਬੀ ਨਾਨਕੀ ਜੀ', clues:['The first Sikh'], tags:'person'},
+            {answer: 'ਭਾੲੀ ਵੀਰ ਸਿੰਘ ਜੀ', clues:['Famous Sikh author'], tags:'person'},
+            {answer: 'ਬਾਬਾ ਫਤਿਹ ਸਿੰਘ ਜੀ', clues:['Youngest Sikh martyr', '4th Sahibzada of Guru Gobind Singh Ji'], tags:'person'},
+            {answer: 'ਮਾਹਾਰਾਜਾ ਰਣਜੀਤ ਸਿੰਘ ਜੀ', clues:['Ruler of the Sikh empire'], tags:'person'},
         ],
         currentAnswer : null,
         currentClues: null,
@@ -157,31 +173,27 @@
                 }
             }         
             return processed.join('');
+        },
+        totalPoints: function(){
+               
+            return this.history.reduce(function (inc, hist) {
+                                    return inc + hist.points;
+                                    }, 0);
         }
     },
     watch:{
         selectedLetters : function(val){
             // won
             if(this.currentAnswer == this.currentProcessedAnswer){
-                this.history.push({answer: this.currentAnswer, status: 'correct'});
+                this.history.push({answer: this.currentAnswer, status: 'correct', points: this.attemptLimit - this.attemptNo});
                 this.currentAnswerNo++;
-                if(this.currentAnswerNo < this.hangmanAnswers.length){
-                    this.gameStatus= 2;
-                }
-                else{
-                    this.gameStatus= 4;
-                }
+                this.gameStatus= 2;
             }
             else{ // in progress
                 if(this.attemptNo == this.attemptLimit){
-                    this.history.push({answer: this.currentAnswer, status: 'wrong'});
+                    this.history.push({answer: this.currentProcessedAnswer, status: 'wrong', points: 0});
                     this.currentAnswerNo++;                    
-                    if(this.currentAnswerNo < this.hangmanAnswers.length){
-                        this.gameStatus= 3;  
-                    }
-                    else{
-                        this.gameStatus= 4;
-                    }
+                    this.gameStatus= 3;  
                 }
             }
         }
