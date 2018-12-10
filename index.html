@@ -60,15 +60,15 @@
                         </a>
                     </div>
                     <div v-if='gameStatus == 0' class='section'>
-                        <a @click='startGame' class='button is-success'>Start Hangman</a>
+                        <a @click='initGame' class='button is-success'>Start Hangman</a>
                     </div>
                     <div v-if='gameStatus == 2' class='section'>
-                        <span>Great you got it right!! The answer was {{currentAnswer}}</span><br />
+                        <span>Great you got it right!! The answer was {{currentAnswer.answer}}</span><br />
                         <span>You received {{attemptLimit - attemptNo}} point(s)</span>
                         <a @click='startGame' class='button is-info'>Next Hangman</a>
                     </div>
                     <div v-if='gameStatus == 3' class='section'>
-                        <span>Oh no you got it wrong!! </span>
+                        <span>Oh no you got it wrong!!</span>
                         <a @click='startGame' class='button is-info'>Next Hangman</a>
                     </div>
                     <div v-if='gameStatus == 4' class='section'>
@@ -77,21 +77,19 @@
                     </div>
                 </div>
                 <div class="tile has-background-info">
-                        <div class='tile is-child' >
-                            <div class='notification'>
-                                Total Points: {{totalPoints}} 
-                                <a v-if='!showClue && currentClues != null' @click='showClue = true' class='button is-info'>Show Clue</a>
-                                <span v-if='showClue && currentClues != null'>{{currentClues[0]}}</span>
-                            </div>
-
-                            <div class="container" v-for='item in history'>
-                                <div class="notification">
-                                    {{item.answer}} - {{item.status}}
-                                </div>
-                            </div>
+                    <div class='tile is-child' >
+                        <div class='notification'>
+                            Total Points: {{totalPoints}} 
+                            <a v-if='!showClue && currentAnswer != null' @click='showClue = true' class='button is-info'>Show Clue</a>
+                            <span v-if='showClue && currentAnswer != null'>{{currentAnswer.clues[0]}}</span>
                         </div>
 
-
+                        <div class="container" v-for='item in history'>
+                            <div class="notification">
+                                {{item.answer}} - {{item.status}}
+                            </div>
+                        </div>
+                    </div>
                 </div>
         </div>
     </div>
@@ -109,8 +107,8 @@
         attemptLimit: 10,
         attemptNo: 0,
         currentAnswerNo: 0,
-        hangmanAnswers: [
-            
+        hangmanAnswers : [],
+        hangmanAllAnswers: [
             {answer: 'ਮਾਤਾ ਭਾਗ ਕੌਰ ਜੀ', clues:['Led the forty liberated ones in the Battle of Muktsar'], tags:'person'},
             {answer: 'ਹਰੀ ਸਿੰਘ ਨਲਵਾ ਜੀ', clues:['Commander-in-chief of the Sikh Khalsa Army'], tags:'person'},
             {answer: 'ਸਿੱਖੀ', clues:['5th largest religion in the world'], tags:''},
@@ -122,8 +120,6 @@
             {answer: 'ਹਰੀ ਸਿੰਘ ਨਲਵਾ ਜੀ', clues:['Commander-in-chief of the Sikh Khalsa Army'], tags:'person'}
         ],
         currentAnswer : null,
-        currentClues: null,
-        currentTags: null,
         selectedLetters: null,
         gameStatus: 0,
         gurmukhiLetters: ['ੳ', 'ਅ', 'ੲ', 'ਸ', 'ਹ',
@@ -140,12 +136,37 @@
                     ]
     },
     methods: {
+        randomList: function(limit, count){
+            let arr = [];
+            while(arr.length < count){
+                let rnd = Math.floor((Math.random() * limit) + 1);
+                if(arr.indexOf(rnd - 1) == -1){
+                    arr.push(rnd - 1); // Need to remove 1 as the random number is from 1 to n
+                }
+            }
+            return(arr);
+        },
+        resetGame: function(){
+            this.history = [];
+            this.showClue = false;
+            this.attemptLimit=10;
+            this.attemptNo= 0;
+            this.currentAnswerNo= 0;
+            this.currentAnswer= null;
+            this.selectedLetters= null;
+            this.gameStatus= 0;
+            this.hangmanAnswers = this.randomList(this.hangmanAllAnswers.length, 2);
+        },
+        initGame: function(){
+            this.hangmanAnswers = this.randomList(this.hangmanAllAnswers.length, 2);
+            console.log(this.hangmanAnswers);
+            this.startGame();
+ 
+        },
         startGame: function(){
             this.gameStatus = this.history.length < this.hangmanAnswers.length ? 1 : 4;
             this.showClue = false;
-            this.currentAnswer = this.hangmanAnswers[this.currentAnswerNo].answer;
-            this.currentClues = this.hangmanAnswers[this.currentAnswerNo].clues;
-            this.currentTags = this.hangmanAnswers[this.currentAnswerNo].tags;
+            this.currentAnswer = this.hangmanAllAnswers[this.hangmanAnswers[this.currentAnswerNo]];
             this.selectedLetters = [];
             this.attemptNo = 0;
         },
@@ -162,8 +183,12 @@
             }
         },
         addSelectedLetter: function(_letter){
-            this.selectedLetters.push(_letter);
-            if(this.currentAnswer.indexOf(_letter) == -1){
+            
+            if(this.selectedLetters.indexOf(_letter) == -1){
+                this.selectedLetters.push(_letter);
+            }
+
+            if(this.currentAnswer.answer.indexOf(_letter) == -1){
                 this.attemptNo++;
             }
         }
@@ -171,12 +196,12 @@
     computed:{
         currentProcessedAnswer: function(){
             var processed = [];
-            for(i=0; i<this.currentAnswer.length; i++) {
-                if(this.selectedLetters.indexOf(this.currentAnswer[i]) > -1 ){
-                    processed.push(this.currentAnswer[i]);
+            for(i=0; i<this.currentAnswer.answer.length; i++) {
+                if(this.selectedLetters.indexOf(this.currentAnswer.answer[i]) > -1 ){
+                    processed.push(this.currentAnswer.answer[i]);
                 }
                 else{
-                    this.currentAnswer[i] == ' ' ? processed.push(' ') : processed.push('_');
+                    this.currentAnswer.answer[i] == ' ' ? processed.push(' ') : processed.push('_');
                 }
             }         
             return processed.join('');
@@ -191,8 +216,8 @@
     watch:{
         selectedLetters : function(val){
             // won
-            if(this.currentAnswer == this.currentProcessedAnswer){
-                this.history.push({answer: this.currentAnswer, status: 'correct', points: this.attemptLimit - this.attemptNo});
+            if(this.currentAnswer != null && this.currentAnswer.answer == this.currentProcessedAnswer){
+                this.history.push({answer: this.currentAnswer.answer, status: 'correct', points: this.attemptLimit - this.attemptNo});
                 this.currentAnswerNo++;
                 this.gameStatus= 2;
             }
