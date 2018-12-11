@@ -46,14 +46,16 @@
             </div>
         </nav>
         <div class="tile is-ancestor">
-                <div class="tile is-4 has-background-danger">
+                <div class="tile is-4 has-background-light">
                     <div v-if='gameStatus == 1' class='section'>
                         <div class='content is-large'>
                             <h1>{{currentProcessedAnswer}}</h1>
                         </div>
                         <div>
                             <h2>Selected Letters ({{attemptLimit - attemptNo}} out of {{attemptLimit}})</h2>
-                            <a class='button is-black' v-for='lt in selectedLetters'>{{lt}}</a>
+                            <a :class='selectLetterColour(lt)' v-for='lt in selectedLetters'>
+                                {{lt}}
+                            </a>
                         </div>
                         <a class='button is-white' @click='addSelectedLetter(akhar)' v-for='(akhar, index) in gurmukhiLetters'>
                             {{akhar}}
@@ -135,7 +137,10 @@
                         'ੌ', '੍', 'ੰ', 'ੱ' 
                     ]
     },
-    methods: {
+    methods: {       
+        selectLetterColour: function(_letter) {
+            return this.currentProcessedAnswer.indexOf(_letter) == -1 ? 'button is-danger' : 'button is-success';
+        },
         randomList: function(limit, count){
             let arr = [];
             while(arr.length < count){
