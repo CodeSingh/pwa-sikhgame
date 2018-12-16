@@ -119,7 +119,13 @@
             {answer: 'ਭਾੲੀ ਵੀਰ ਸਿੰਘ ਜੀ', clues:['Famous Sikh author'], tags:'person'},
             {answer: 'ਬਾਬਾ ਫਤਿਹ ਸਿੰਘ ਜੀ', clues:['Youngest Sikh martyr', '4th Sahibzada of Guru Gobind Singh Ji'], tags:'person'},
             {answer: 'ਮਾਹਾਰਾਜਾ ਰਣਜੀਤ ਸਿੰਘ ਜੀ', clues:['Ruler of the Sikh empire'], tags:'person'},
-            {answer: 'ਹਰੀ ਸਿੰਘ ਨਲਵਾ ਜੀ', clues:['Commander-in-chief of the Sikh Khalsa Army'], tags:'person'}
+            {answer: 'ਹਰੀ ਸਿੰਘ ਨਲਵਾ ਜੀ', clues:['Commander-in-chief of the Sikh Khalsa Army'], tags:'person'},
+            {answer: 'ਸ੍ਰੀ ਅਕਾਲ ਤਖ਼ਤ ਸਾਹਿਬ', clues:['One of the five takht'], tags:'place'},
+            {answer: 'ਤਖ਼ਤ ਸ੍ਰੀ ਦਮਦਮਾ ਸਾਹਿਬ', clues:['One of the five takht'], tags:'place'},
+            {answer: 'ਤਖ਼ਤ ਸ੍ਰੀ ਕੇਸਗੜ੍ਹ ਸਾਹਿਬ', clues:['One of the five takht'], tags:'place'},
+            {answer: 'ਤਖ਼ਤ ਸ੍ਰੀ ਹਜੂਰ ਸਾਹਿਬ', clues:['One of the five takht'], tags:'place'},
+            {answer: 'ਤਖ਼ਤ ਸ੍ਰੀ ਪਟਨਾ ਸਾਹਿਬ', clues:['One of the five takht'], tags:'place'},
+            {answer: 'ਮਾਤਾ ਖੀਵੀ ਜੀ', clues:['Established the Sikh tradition of langar or free kitchen'], tags:'person'}
         ],
         currentAnswer : null,
         selectedLetters: null,
@@ -188,14 +194,15 @@
             }
         },
         addSelectedLetter: function(_letter){
-            
             if(this.selectedLetters.indexOf(_letter) == -1){
                 this.selectedLetters.push(_letter);
+
+                if(this.currentAnswer.answer.indexOf(_letter) == -1){
+                    this.attemptNo++;
+                }
             }
 
-            if(this.currentAnswer.answer.indexOf(_letter) == -1){
-                this.attemptNo++;
-            }
+
         }
     },
     computed:{
@@ -231,6 +238,7 @@
                     this.history.push({answer: this.currentProcessedAnswer, status: 'wrong', points: 0});
                     this.currentAnswerNo++;                    
                     this.gameStatus= 3;  
+                    
                 }
             }
         }
