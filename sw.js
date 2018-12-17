@@ -1,5 +1,5 @@
 var GENERAL_CACHE_NAME = 'pwa-sikhgame'
-var CACHE_NAME = GENERAL_CACHE_NAME + 'v5';
+var CACHE_NAME = GENERAL_CACHE_NAME + 'v6';
 
 self.addEventListener('install', function(e) {
  e.waitUntil(
@@ -10,7 +10,9 @@ self.addEventListener('install', function(e) {
        '/pwa-sikhgame/bulma.min.css',
        '/pwa-sikhgame/index.css',
        '/pwa-sikhgame/manifest.json',
-       '/pwa-sikhgame/vue.js'
+       '/pwa-sikhgame/vue.js',
+       '/pwa-sikhgame/SikhGames.png',
+       '/pwa-sikhgame/share.png'
      ]);
    })
  );
