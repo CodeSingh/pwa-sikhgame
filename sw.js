@@ -1,5 +1,5 @@
 var GENERAL_CACHE_NAME = 'pwa-sikhgame'
-var CACHE_NAME = GENERAL_CACHE_NAME + 'v6';
+var CACHE_NAME = GENERAL_CACHE_NAME + 'v7';
 
 self.addEventListener('install', function(e) {
  e.waitUntil(

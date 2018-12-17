@@ -81,7 +81,8 @@
                 <div class="tile has-background-info">
                     <div class='tile is-child' >
                         <div class='notification'>
-                            Total Points: {{totalPoints}} 
+                            Total Points: <strong>{{totalPoints}}</strong> <span v-if='currentAnswer != null'>Tags:</span> <strong v-if='currentAnswer != null'>{{currentAnswer.tags}}</strong><br />
+                            
                             <a v-if='!showClue && currentAnswer != null' @click='showClue = true' class='button is-info'>Show Clue</a>
                             <span v-if='showClue && currentAnswer != null'>{{currentAnswer.clues[0]}}</span>
                         </div>
